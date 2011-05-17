@@ -1,0 +1,4 @@
+- Copy files of './src/bin/' into a user-accessible directory, so that it could be run with Python.
+- Copy files of './data/' into the S60 custom font directory, usually 'z:\resource\fonts\'.
+  To do so, (normally you don't have enough permissions,) use a flash card reader and copy the font-files to directory 'resource\fonts\'.
+  Create the "resource" and "fonts" directory if it doesn't exist yet.
