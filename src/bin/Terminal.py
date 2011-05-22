@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 import appuifw, e32
 import keycapture, key_codes
 
@@ -17,6 +18,7 @@ MAX_DELAY_CONTINEOUS_PRESS = 0.200
 MIN_TAP_TO_AUTOCOMPLETE = 2
 DO_CURSOR_REFRESH_FOR_SIMPLE_PRINT = False
 DO_INPUT_REFRESH_FOR_SIMPLE_PRINT = True
+NAVIGATION_LINESPEED = 4
 DEFAULT_STYLE = {'color' : 0x000000, 'highlight_color' : 0xFFFFFF, 'bold' : False, 'style' : 0}
 
 exitAllPython = False
@@ -252,7 +254,18 @@ class Prompt:
         e32.ao_sleep(0, execute)
     elif key in (key_codes.EKeyUpArrow, key_codes.EKeyDownArrow, key_codes.EKeyLeftArrow, key_codes.EKeyRightArrow):
       if self.navigation:
-        forwarding = 1
+        if key in (key_codes.EKeyUpArrow, key_codes.EKeyDownArrow):
+          delta = (key == key_codes.EKeyDownArrow)
+          end = delta * (text.len() - 1)
+          lines = 0
+          for i in range(pos - 1 * (1 - delta), end - 1 + 2*delta, 2*delta - 1):
+            if text.get(i, 1) in ("\n", u"\u2029"):
+              lines += 1
+            if lines == NAVIGATION_LINESPEED or i == end:
+              text.set_pos(i)
+              break
+        else:
+          forwarding = 1
       else:
         if key in (key_codes.EKeyUpArrow, key_codes.EKeyDownArrow):
           if self.history:
@@ -550,7 +563,10 @@ def pseudo_osSystemCommand(cmd, args):
   elif cmd == "cat":
     if os.path.exists(args[0][0]) and os.path.isfile(args[0][0]):
       if os.path.getsize(args[0][0]) < MAX_FILELENGTH:
-        print open(args[0][0], 'rb').read()
+        try:
+          print open(args[0][0], 'rb').read()
+        except IOError:
+          print "File cannot be read."
       else:
         print "File is too big to show here."
         return 2
@@ -675,15 +691,16 @@ def pseudo_osSystemCommand(cmd, args):
       try:
         execfile(args[0][0], namespace)
       except:
-        import traceback
-        print "Exception in script '%s' code:" % args[0][0]
-        print '-'*36
-        traceback.print_exc(file=sys.stdout)
-        print '-'*36
         exc_type, exc_value, exc_traceback = sys.exc_info()
-        if exc_type == KeyboardInterrupt and wantExit and not exitAllPython:
+        if exc_type != SystemExit:
+          import traceback
+          print "Exception in script '%s' code:" % args[0][0]
+          print '-'*36
+          traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+          print '-'*36
+        if exc_type in (KeyboardInterrupt, SystemExit) and wantExit and not exitAllPython:
           wantExit = False
-        if exceptionCallback:
+        if exceptionCallback and exc_type != SystemExit:
           exceptionCallback(exc_type, exc_value, traceback.extract_tb(exc_traceback))
         toReturn = -1
       endLastPythonScript()
@@ -708,7 +725,7 @@ def pseudo_osSystemCommand(cmd, args):
             wantExit = False
           print "Bye!"
           return -1
-        if inp == "quit":
+        if inp in ("quit()", "exit()"):
           break
         if inp:
           if inp[0] in (" ", "\t"):
@@ -744,12 +761,13 @@ def pseudo_osSystemCommand(cmd, args):
           except:
             exc_type, exc_value, exc_traceback = sys.exc_info()
           if not exc_type == exc_value == exc_traceback == None:
-            import traceback
-            print "Exception in user code:"
-            print '-'*36
-            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
-            print '-'*36
-            if exc_type == KeyboardInterrupt and wantExit and not exitAllPython:
+            if exc_type != SystemExit:
+              import traceback
+              print "Exception in user code:"
+              print '-'*36
+              traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+              print '-'*36
+            if exc_type in (KeyboardInterrupt, SystemExit) and wantExit and not exitAllPython:
               wantExit = False
           endLastPythonScript()
       endLastPythonScript()
