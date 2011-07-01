@@ -5,7 +5,7 @@ description = \
 This is an alternative for the terminalTools module builtin in the 'Terminal for PyS60'.
 Some functionality is lacking, e.g. the 'keyGrabber' is not functional, 
 things like history or autocomplete aren't either and 
-also the special printing output (with colours and styled text) is not available.
+also the bold feature of styled text printing is not available (yet).
 However most of these options could be implemented, 
 like for example with the module 'curses' for Linux terminals, 
 but it will lose the platform-independance. (See the section at the bottom for more info).
@@ -23,31 +23,43 @@ def checkFeature(feature, verbose = False):
 
 
 class KeyGrabber:
+	
 	def __init__(self):
 		self.setContineousPress(False)
 		self.stop()
+	
 	def setContineousPress(self, b):
 		self.contineousPress = b
 		self.keys = []
+	
 	def start(self):
 		self.active = True
+	
 	def stop(self):
 		self.active = False
 		self.keys = []
+	
 	def pause(self):
 		self.active = False
+	
 	def resume(self):
 		self.start()
+	
 	def get(self):
 		return self.keys
 
+
 class History:
+  
   def __init__(self):
     self.active = True
+  
   def reset(self):
     pass
 
+
 class ColoramaWrapper:
+  
   def __init__(self):
     try:
       import colorama
@@ -59,7 +71,9 @@ class ColoramaWrapper:
       print "Warning: The python depencency 'colorama' is not installed. Styled printing will not work."
       self.colorama = None
       self.fake = True
+    
     self.setup()
+  
   def setup(self, fake = False):
     if self.fake:
       self.resetChars = ""
@@ -93,6 +107,7 @@ class ColoramaWrapper:
     self.RgbColors.append((255, 0, 255))
     self.RgbColors.append((0, 255, 255))
     self.RgbColors.append((255, 255, 255))
+  
   def getPreceedingChars(self, h, mode):
     if self.fake:
       return ""
@@ -135,6 +150,7 @@ def print_special(s, doNL = True, styles = None, reset = True, **kwargs):
     if reset:
       out += coloramaWrapper.resetChars
     sys.stdout.write(out)
+  
   if styles:
     for styleText in s:
       write(styleText[0], color = styles[styleText[1]][0], highlight_color = styles[styleText[1]][1])
@@ -166,5 +182,6 @@ try: # Override platform dependant functions
 	del os # Let the platform dependant functions be able to override 'os'
 
 	exec "from terminalTools_%s import *" % osname
+
 except ImportError:
 	pass
