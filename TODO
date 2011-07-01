@@ -1,11 +1,13 @@
 - Optimalize the code (more ObjectOriented) to ease use of the Terminal in other PyS60 apps such as Python IDE's like PED.
 - Determine to implement the ascii color codes instead of using a style tuple passing through terminalTools.print_special(...), and relevant functions.
+- Improve Terminal when it reaches MAX_TERMINAL_LENGTH, because of an issue with the pys60 text component (when deleting text from above when currently at the bottom).
 - Some testing on executing Symbian-executables.
 - Check for KeyboardInterrupt whiles calling stdout.write().
 - Support for executing Python apps using gui of appuifw (mainly because if the external app quits, 
 the signal is given to lock, which then quits both external app and the Terminal itself.)
 - Massive testing whether the apps behaves correctly while executing more complex code.
-- More examples.
+- More examples/demos.
 - Api doc for module 'terminalTools'.
-- More support for non-S60 devices (e.g. such as a Linux machine) by updating 'terminalTools_posix' (using "curses" module) and other modules.
-I thought using the platform independant python modules 'colorama' and 'pykeylogger'.
+- Bold support for non-S60 devices.
+- More support for non-S60 devices by updating the specific 'terminalTools_OS' modules and the main 'terminalTools' module:
+I thought using the platform independant python module 'colorama' and 'pyHook' (windows) / 'python-xlib' (linux and mac).
