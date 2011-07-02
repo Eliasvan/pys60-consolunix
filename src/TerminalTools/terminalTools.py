@@ -3,12 +3,10 @@
 description = \
 """
 This is an alternative for the terminalTools module builtin in the 'Terminal for PyS60'.
-Some functionality is lacking, e.g. the 'keyGrabber' is not functional, 
+Some functionality is lacking, e.g. the 'keyGrabber' is not yet functional, 
 things like history or autocomplete aren't either and 
-also the bold feature of styled text printing is not available (yet).
-However most of these options could be implemented, 
-like for example with the module 'curses' for Linux terminals, 
-but it will lose the platform-independance. (See the section at the bottom for more info).
+also the bold feature of styled text printing are not available (yet).
+Not all colours of styled text printing are supported: only the ones available in xterm.
 """
 
 print description
@@ -136,6 +134,7 @@ versionStatus = "beta stable"
 history = History()
 history.active = False
 coloramaWrapper = ColoramaWrapper()
+del ColoramaWrapper
 
 
 def print_special(s, doNL = True, styles = None, reset = True, **kwargs):
