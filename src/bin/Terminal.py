@@ -9,7 +9,8 @@ from time import sleep, time
 
 
 MAX_HISTORY = 30
-MAX_TERMINAL_LENGTH = 3200
+MAX_TERMINAL_LENGTH = 3000
+MAX_TERMINAL_LENGTH_BUFFER = 400 # So the total maximum allowed chars is MAX_TERMINAL_LENGTH + MAX_TERMINAL_LENGTH_BUFFER
 MAX_FILELENGTH = 32000
 MAX_FILELISTINGLENGTH = 30
 MAX_COPY_STEP = 1024000
@@ -180,7 +181,7 @@ class Prompt:
   def add(self, s):
     if not s:
       return
-    if text.len() + len(s) > MAX_TERMINAL_LENGTH:
+    if text.len() + len(s) > MAX_TERMINAL_LENGTH + MAX_TERMINAL_LENGTH_BUFFER:
       if len(s) > MAX_TERMINAL_LENGTH:
         s = s[len(s) - MAX_TERMINAL_LENGTH:]
       toRemove = text.len() + len(s) - MAX_TERMINAL_LENGTH
@@ -372,7 +373,7 @@ class PseudoStdOut(object):
       prompt.toEnd()
       text.color = kwargs['color']
       text.highlight_color = kwargs['highlight_color']
-      text.style = ((kwargs['highlight_color'] != 0xFFFFFF) * appuifw.HIGHLIGHT_STANDARD | kwargs['bold'] * appuifw.STYLE_BOLD)
+      text.style = ((kwargs['highlight_color'] != DEFAULT_STYLE['highlight_color']) * appuifw.HIGHLIGHT_STANDARD | kwargs['bold'] * appuifw.STYLE_BOLD)
       prompt.add(s)
       text.color = DEFAULT_STYLE['color']
       text.highlight_color = DEFAULT_STYLE['highlight_color']
@@ -406,7 +407,7 @@ class TerminalTools:
       if doNL:
         print
     else:
-      sys.stdout.write(s+"\n"*doNL, **kwargs)
+      sys.stdout.write(s + "\n"*doNL, **kwargs)
   def raw_input(self, s = ""):
     return self.raw_input_special(s)
   def raw_input_special(self, s = "", autoComplete = None, **kwargs):
