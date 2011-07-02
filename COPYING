@@ -1,4 +1,7 @@
-- Terminal : GNU GPL V3
-   Maintainer : Elias Vanderstuyft
+- ./src/bin/Terminal.py, ./src/TerminalTools/terminalTools*.py, ./src/demo.py : GNU GPL V3
+   Author and Maintainer : Elias Vanderstuyft
 
-- DejaVuMono Fonts : http://dejavu-fonts.org/wiki/License
+- ./src/TerminalTools/pyxhook.py : GNU GPL V2+
+   Authors : Tim Alexander and Daniel Folkinshteyn
+
+- DejaVuMono Fonts in ./data : http://dejavu-fonts.org/wiki/License
