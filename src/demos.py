@@ -18,6 +18,7 @@ def checkTerminalTools(version = 1.0):
 		print "Successfully loaded terminalTools!"
 	else:
 		print "Failed to load terminalTools. If you experience problems, you know what's the reason."
+	print "=" * 20 + "\n"
 	return ok
 
 def checkTerminalToolsQuick():
@@ -145,7 +146,7 @@ def autoCompleteDemo():
 		elif n:
 			for name in names:
 				if n == name[:len(n)]:
-					return name[0].upper() + name[1:].lower()
+					return name[0].upper() + name[1:]
 		return orig
 	
 	name = "EMPTY"
@@ -156,6 +157,13 @@ def autoCompleteDemo():
 		elif name:
 			print "Who? I don't know %s." % name
 
+def defaultInputTextDemo():
+	isSuported = terminalTools.checkFeature("defaultInputText", True)
+
+	if isSuported:
+		inp = terminalTools.raw_input_special("Type a comment: ", defaultText = "# a comment")
+		print 'You typed "%s".' % inp
+
 
 
 if checkTerminalTools():
@@ -163,7 +171,7 @@ if checkTerminalTools():
 
 	sayHello()
 	
-	demos = ["sayHello", "inputDemo", "drawDemo", "keyGrabDemo", "historyDemo", "autoCompleteDemo"]
+	demos = ["sayHello", "inputDemo", "drawDemo", "keyGrabDemo", "historyDemo", "autoCompleteDemo", "defaultInputTextDemo"]
 	text = ""
 	for i, demo in enumerate(demos):
 		text += " %s. %s() \n" % (i+1, demo)
