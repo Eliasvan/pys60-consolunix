@@ -8,6 +8,8 @@ import os, sys
 from time import sleep, time
 
 
+DEFAULT_PATH = "C:\\Data\\python"
+
 MAX_HISTORY = 30
 MAX_TERMINAL_LENGTH = 3000
 MAX_TERMINAL_LENGTH_BUFFER = 400 # So the total maximum allowed chars is MAX_TERMINAL_LENGTH + MAX_TERMINAL_LENGTH_BUFFER
@@ -112,7 +114,7 @@ class InputHandler:
     if self.waitForInput:
       terminalTools.print_special(self.updateData[0], doNL = False, **self.updateData[1])
       prompt.setPosToEnd(True)
-  def get(self, s, autoComplete, **kwargs):
+  def get(self, s, autoComplete, defaultText, **kwargs):
     if self.waitForInput:
       print "\nTerminal: Getting input in an existing input-request is forbidden."
       print "Terminal: Probably you attempted to do an input-request in an autocomplete callback."
@@ -128,6 +130,7 @@ class InputHandler:
     prompt.setAutoComplete(autoComplete)
     terminalTools.print_special(s, doNL = False, **kwargs)
     prompt.setPosToEnd(True)
+    prompt.add(defaultText)
     self.waitForInput = True
     while True:
       if wantExit or not self.waitForInput:
@@ -390,7 +393,7 @@ class PseudoStdOut(object):
 
 class TerminalTools:
   def __init__(self):
-    self.features = ["keyGrabber", "keyGrabber.contineousPress", "history", "autoComplete", "styledPrinting"]
+    self.features = ["keyGrabber", "keyGrabber.contineousPress", "history", "autoComplete", "styledPrinting", "defaultInputText"]
     self.keyGrabber = KeyGrabber()
     self.version = "1.0"
     self.versionStatus = "beta stable"
@@ -410,17 +413,18 @@ class TerminalTools:
       sys.stdout.write(s + "\n"*doNL, **kwargs)
   def raw_input(self, s = ""):
     return self.raw_input_special(s)
-  def raw_input_special(self, s = "", autoComplete = None, **kwargs):
-    return inputHandler.get(s, autoComplete, **kwargs)
+  def raw_input_special(self, s = "", autoComplete = None, defaultText = "", **kwargs):
+    return inputHandler.get(s, autoComplete, defaultText, **kwargs)
   def input(self, s = ""):
     return self.input_special(s)
-  def input_special(self, s = "", autoComplete = None, **kwargs):
-    exec 'toReturn = %s' % self.raw_input_special(s, autoComplete, **kwargs)
+  def input_special(self, s = "", autoComplete = None, defaultText = "", **kwargs):
+    exec 'toReturn = %s' % self.raw_input_special(s, autoComplete, defaultText, **kwargs)
     return toReturn
 
 
 def checkForExit():
   if wantExit:
+    terminalTools.keyGrabber.stop()
     raise KeyboardInterrupt
 
 
@@ -974,6 +978,8 @@ def initTerminal():
   os.system("clear")
   os.system("help")
   
+  if DEFAULT_PATH and os.path.exists(DEFAULT_PATH):
+    os.chdir(DEFAULT_PATH)
   startPath = os.path.abspath(".")
   sys.argv = [""]
   sys.path.insert(0, startPath)
@@ -1007,13 +1013,18 @@ def toggleFullscreen():
 def toggleNavigation():
   global navigation
   prompt.navigation = not prompt.navigation
-  appuifw.app.menu = [(u'%s navigation' % ["Enable", "Disable"][prompt.navigation], toggleNavigation), (u'Send KeyInterrupt', sendInterrupt), (u'Change FontSize', changeSize), (u'Toggle Fullscreen', toggleFullscreen)]
+  appuifw.app.menu = [(u'%s navigation' % ["Enable", "Disable"][prompt.navigation], toggleNavigation), (u'Send KeyInterrupt', sendInterrupt), (u'Change FontSize', changeSize), (u'Toggle Fullscreen', toggleFullscreen), (u'Pause keycapturer', pauseKeyCapturer)]
   
 def sendInterrupt():
   global wantExit
   if pythonScripts:
     wantExit = True
 
+
+def pauseKeyCapturer():
+	prompt.keycapturer.stop()
+	appuifw.query(u'Pausing... \nPress OK or Cancel to resume.', 'query')
+	prompt.keycapturer.start()
 
 def backupFunctions():
 	# Copy important wrapper functions
@@ -1067,7 +1078,7 @@ def main(excCallback = None):
   text.style = appuifw.HIGHLIGHT_STANDARD
   appuifw.app.body = text
   appuifw.app.title = u"Terminal"
-  appuifw.app.menu = [(u'Enable navigation', toggleNavigation), (u'Send KeyInterrupt', sendInterrupt), (u'Change FontSize', changeSize), (u'Toggle Fullscreen', toggleFullscreen)]
+  appuifw.app.menu = [(u'Enable navigation', toggleNavigation), (u'Send KeyInterrupt', sendInterrupt), (u'Change FontSize', changeSize), (u'Toggle Fullscreen', toggleFullscreen), (u'Pause keycapturer', pauseKeyCapturer)]
   
   initTerminal()
 
