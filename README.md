@@ -1,6 +1,6 @@
-Warning:
+_Warning:
 Automatically exported from "code.google.com/p/pys60-consolunix",
-so some things might be wrongly converted.
+so some things might be wrongly converted._
 
 A simple but powerful Unix-like console for S60 devices based on Python.
 It features a built-in python command and also some common commands of a standard Unix terminal.
